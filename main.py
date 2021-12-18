@@ -22,9 +22,9 @@ def ReadFunction():
 
     ipAdress = ui.lne_ip.text()   # ip adresi
 
-    rnumber1 = ui.lne_customreadnum1.text()
+    rnumber1 = int(ui.lne_customreadnum1.text())
 
-    rnumber2 = ui.lne_customreadnum1.text()
+    rnumber2 = int(ui.lne_customreadnum1.text())
 
     client = ModbusClient(host=ipAdress, port = 502)
 
@@ -32,7 +32,7 @@ def ReadFunction():
 
     temp = client.read_holding_registers(rnumber1, rnumber2)
 
-    ui.lne_customreadvalue.setText(temp)
+    ui.lne_customreadvalue.setText(str(temp))
     
 
 def WriteFunction():
@@ -41,9 +41,9 @@ def WriteFunction():
 
     client = ModbusClient(host=ipAdress, port = 502)
 
-    wrnumber = ui.lne_customwritenum.text()  
+    wrnumber = int(ui.lne_customwritenum.text())  
 
-    wvalues = ui.lne_customwritevalue.text()
+    wvalues = [int(ui.lne_customwritevalue.text())]
 
     client.write_multiple_registers(wrnumber, wvalues)
 
