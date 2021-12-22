@@ -1,65 +1,75 @@
-import sys
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
-
-from mainpage import*
-
-from pyModbusTCP.client import ModbusClient
-
-#-------------Ana Fonskiyonumuz------------#
-#------------------------------------------#
-
-Uygulama = QApplication(sys.argv)
-anaPencere = QMainWindow()
-ui=Ui_MainWindow()
-ui.setupUi(anaPencere)
-anaPencere.show()
-
-#-------------Kullanıcı İşlemleri------------#
-#--------------------------------------------#
-
-def ReadFunction():
-
-    ipAdress = ui.lne_ip.text()   # ip adresi
-
-    rnumber1 = int(ui.lne_customreadnum1.text())
-
-    rnumber2 = int(ui.lne_customreadnum1.text())
-
-    client = ModbusClient(host=ipAdress, port = 502)
-
-    client.open()
-
-    temp = client.read_holding_registers(rnumber1, rnumber2)
-
-    ui.lne_customreadvalue.setText(str(temp))
-    
-
-def WriteFunction():
-
-    ipAdress = ui.lne_ip.text()   # ip adresi
-
-    client = ModbusClient(host=ipAdress, port = 502)
-
-    wrnumber = int(ui.lne_customwritenum.text())  
-
-    wvalues = [int(ui.lne_customwritevalue.text())]
-
-    client.write_multiple_registers(wrnumber, wvalues)
+from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem
+import sys
 
 
-#-----------------Deneme---------------#
-#--------------------------------------#
+from modbus import Ui_MainWindow
 
 
+#-------------- Database --------------#
+import sqlite3
+conn = sqlite3.connect('database.db')
+curs = conn.cursor()
+
+sorguOlustur = ("""CREATE TABLE IF NOT EXISTS registers(Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                 \
+ RegisterFunction TEXT NOT NULL,                      \
+ RegisterNumber INTEGER NOT NULL)""")
+
+curs.execute(sorguOlustur)
+conn.commit()
 
 
-#-----------------Sinyal Slot---------------#
-#-------------------------------------------#
+#   one time function
+#for i in range(250):
+#
+#    a= f"Register{i}"
+#
+#    curs.execute("""INSERT INTO registers (RegisterFunction, RegisterNumber) VALUES (?, ?);""",(a, i))
+#    
+#    conn.commit()
+#-------------------------------------#
 
-ui.btn_read.clicked.connect(ReadFunction)
-ui.btn_write.clicked.connect(WriteFunction)
+class Modbus(QMainWindow, Ui_MainWindow):
 
 
-sys.exit(Uygulama.exec_())
+    def __init__(self, parent=None):
+
+        super().__init__(parent)
+
+        self.ui = Ui_MainWindow()
+
+        self.ui.setupUi(self)
+
+        self.conn = sqlite3.connect('database.db')
+
+        self.addRegisterNumberstoList()
+
+        self.ui._tableWrite.setItem(0, 0,  QTableWidgetItem("text1"))
+
+
+    def addRegisterNumberstoList(self):
+        
+        curs = self.conn.cursor()
+
+        curs.execute("SELECT RegisterFunction FROM registers")
+
+        for row in curs.fetchall():
+
+            self.ui._lstWrite.addItem(row[0])
+            self.ui._lstRead.addItem(row[0])
+
+
+if __name__ == "__main__":
+
+    app = QApplication(sys.argv)
+
+    app.setApplicationDisplayName("Modbus")
+
+    mainPage = Modbus()
+
+    mainPage.show()
+
+    sys.exit(app.exec_())
 
