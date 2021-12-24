@@ -35,7 +35,6 @@ conn.commit()
 
 class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
-
     def __init__(self, parent=None):
 
         super().__init__(parent)
@@ -50,7 +49,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.addRegisterNumberstoList()
 
-        self.ui._tableWrite.setItem(0, 0,  QTableWidgetItem("falan"))   # set item in 0, 0 position
+        #self.ui._tableWrite.setItem(0, 0,  QTableWidgetItem("falan"))   # set item in 0, 0 position
 
         self.ui._tableWrite.setHorizontalHeaderLabels(["Register Name", "Register Value"])
 
@@ -67,11 +66,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui._tableWrite.itemChanged.connect(self.modbusWriteFunction)
 
-
-
         #self.ui._lstWrite.itemClicked.connect(self.dragAndDroptoTable) additional features
 
-        #self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget)
+        #self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget) 
         
     def addRegisterNumberstoList(self):
         
@@ -94,16 +91,16 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         row_1 = [item.text()]
 
-        row = self.ui._tableWrite.rowCount()
+        row = self.ui._tableWrite.rowCount()  #  gets table row count
 
-        self.ui._tableWrite.setRowCount(row+1)
+        self.ui._tableWrite.setRowCount(row+1) #  increment the row count
 
         col = 0
 
         for item in row_1:
 
-            cell = QTableWidgetItem(str(item))
-            self.ui._tableWrite.setItem(row, col, cell)
+            cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem 
+            self.ui._tableWrite.setItem(row, col, cell)  # set item to declared row and col index
             col += 1
 
         
@@ -111,19 +108,18 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         row_1 = [item.text()]
 
-        row = self.ui._tableRead.rowCount()
+        row = self.ui._tableRead.rowCount() #  gets table row count
 
-        self.ui._tableRead.setRowCount(row+1)
+        self.ui._tableRead.setRowCount(row+1) #  increment the row count
 
         col = 0
 
         for item in row_1:
 
-            cell = QTableWidgetItem(str(item))
-            self.ui._tableRead.setItem(row, col, cell)
+            cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+            self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
             col += 1
 
-        pass
 
     def modbusWriteFunction(self, item):
 
