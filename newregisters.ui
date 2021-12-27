@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
-    <height>438</height>
+    <width>548</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -539,9 +539,9 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>0</y>
+      <y>10</y>
       <width>181</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -606,7 +606,7 @@ QAbstractSpinBox {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>565</width>
+     <width>548</width>
      <height>26</height>
     </rect>
    </property>

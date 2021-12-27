@@ -29,6 +29,7 @@ conn.commit()
 #    a= f"Register{i}"
 #
 #    curs.execute("""INSERT INTO registers (RegisterFunction, RegisterNumber) VALUES (?, ?);""",(a, i))
+
 #    
 #    conn.commit()
 #-------------------------------------#
@@ -93,15 +94,29 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         row = self.ui._tableWrite.rowCount()  #  gets table row count
 
+        column = self.ui._tableWrite.columnCount()
+
         self.ui._tableWrite.setRowCount(row+1) #  increment the row count
 
         col = 0
 
+        print(column)
+
+        col2 = 1
+
         for item in row_1:
 
-            cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem 
+            cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
+            cell2 = QTableWidgetItem(str(item)) 
+        
             self.ui._tableWrite.setItem(row, col, cell)  # set item to declared row and col index
-            col += 1
+
+
+        for item in row_1:
+
+            cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
+        
+            self.ui._tableWrite.setItem(row, col2, cell)  # set item to declared row and col index
 
         
     def addRegistertoRTableFunc(self, item):
@@ -112,13 +127,13 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui._tableRead.setRowCount(row+1) #  increment the row count
 
-        col = 0
-
         for item in row_1:
 
-            cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+            cell = QTableWidgetItem(str(item), str(item))# makes the item to be QTableWidgetItem 
             self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
-            col += 1
+            print(cell)
+            
+            
 
 
     def modbusWriteFunction(self, item):
@@ -127,6 +142,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         print(item.text())
 
+        print(item)
 
         #client = ModbusClient(host=ipAdress, port = 502)
 
