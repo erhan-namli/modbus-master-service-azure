@@ -1,3 +1,6 @@
+# TO - DO
+# - Write a function to do when clicked on item take the value of that and store, then after write a function which makes taking # changed value
+
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
@@ -10,6 +13,8 @@ from newregisters import *
 from modbus import Ui_MainWindow
 
 from pyModbusTCP.client import ModbusClient
+
+import re
 
 #-------------- Database --------------#
 import sqlite3
@@ -29,7 +34,6 @@ conn.commit()
 #    a= f"Register{i}"
 #
 #    curs.execute("""INSERT INTO registers (RegisterFunction, RegisterNumber) VALUES (?, ?);""",(a, i))
-
 #    
 #    conn.commit()
 #-------------------------------------#
@@ -37,6 +41,13 @@ conn.commit()
 class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def __init__(self, parent=None):
+
+        # Variables
+        self.writeModbus = None  # Register Value
+
+        self.writeRModbus = None # Register Number
+
+        self.readModbus = None # Register Number
 
         super().__init__(parent)
 
@@ -57,7 +68,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.ui._tableRead.setHorizontalHeaderLabels(["Register Name", "Register Value"])
 
         item1 = self.ui._lstWrite.item(0).text()
-
         
         #-------------- Signal Slot --------------
 
@@ -69,9 +79,19 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         #self.ui._lstWrite.itemClicked.connect(self.dragAndDroptoTable) additional features
 
-        #self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget) 
+        #self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget)
+         
+        self.ui._tableWrite.itemActivated.connect(self.storeData)  # past value
+
+        self.ui._tableWrite.itemClicked.connect(self.storeData) # new value
+
+    def storeData(self, item):
         
-    def addRegisterNumberstoList(self):
+        # Storing the clicked data
+
+        self.writeRModbus = item.text()
+
+    def addRegisterNumberstoList(self): # This function does fill the list widgets with registers
         
         curs = self.conn.cursor()
 
@@ -86,7 +106,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def dragAndDroptoTable(self, item):
 
         pass
-
     
     def addRegistertoWTableFunc(self, item):
 
@@ -100,26 +119,23 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         col = 0
 
-        print(column)
-
         col2 = 1
 
-        for item in row_1:
+        for item in row_1:  # First columns item
 
             cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
-            cell2 = QTableWidgetItem(str(item)) 
         
             self.ui._tableWrite.setItem(row, col, cell)  # set item to declared row and col index
 
-
-        for item in row_1:
+        for item in row_1:   # Second columns item
 
             cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
         
             self.ui._tableWrite.setItem(row, col2, cell)  # set item to declared row and col index
 
-        
     def addRegistertoRTableFunc(self, item):
+
+        ipAdress = self.ui._lneIp.text() # ip adresi
 
         row_1 = [item.text()]
 
@@ -127,34 +143,53 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui._tableRead.setRowCount(row+1) #  increment the row count
 
+        col=0
+
+        col2 = 1
+
+        temp = item.text()
+
+        tempP = int(re.search(r'\d+', temp).group())
+
+        client = ModbusClient(host=ipAdress, port = 502)
+
+        readValuefromRegister = client.read_holding_registers(tempP, tempP+1)   # column2 value must be this, change when you are doing simulation
+
         for item in row_1:
 
-            cell = QTableWidgetItem(str(item), str(item))# makes the item to be QTableWidgetItem 
+            cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
             self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
-            print(cell)
-            
-            
 
+        for item in row_1:
+
+            cell = QTableWidgetItem(str(tempP))# makes the item to be QTableWidgetItem 
+            self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
 
     def modbusWriteFunction(self, item):
 
         ipAdress = self.ui._lneIp.text() # ip adresi
+        try:
+            wrnumber = int(re.search(r'\d+', self.writeRModbus).group())
 
-        print(item.text())
+            temp = item.text()
 
-        print(item)
+            tempP = int(re.search(r'\d+', temp).group())
 
-        #client = ModbusClient(host=ipAdress, port = 502)
+            wvalues = [tempP]  # must be array type because write_multiple_registers function takes this paramater as an array
 
-        #client.write_multiple_registers(wrnumber, wvalues)
+            print(wrnumber, wvalues)
+            client = ModbusClient(host=ipAdress, port = 502)
+
+            client.write_multiple_registers(wrnumber, wvalues)
+            self.writeRModbus = None # discharge past values
+        except:
+            pass
     
-
     # Drag and Drop helper function
     # def mouseMoveEvent(self, event):
         #print("Erhan2")
         #return [event.x(), event.y()]
         #print('Mouse coords: ( %d : %d )' % (event.x(), event.y()))
-
 
 class RecordingRegisters(QWidget, Ui_Form):
 
