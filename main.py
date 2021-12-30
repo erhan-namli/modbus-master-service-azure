@@ -153,7 +153,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         client = ModbusClient(host=ipAdress, port = 502)
 
-        readValuefromRegister = client.read_holding_registers(tempP, tempP+1)   # column2 value must be this, change when you are doing simulation
+        client.open()
+
+        readValuefromRegister = client.read_holding_registers(tempP, 1)   # column2 value must be this, change when you are doing simulation
 
         for item in row_1:
 
@@ -162,7 +164,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         for item in row_1:
 
-            cell = QTableWidgetItem(str(tempP))# makes the item to be QTableWidgetItem 
+            cell = QTableWidgetItem(str(readValuefromRegister))# makes the item to be QTableWidgetItem 
             self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
 
     def modbusWriteFunction(self, item):
@@ -177,8 +179,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             wvalues = [tempP]  # must be array type because write_multiple_registers function takes this paramater as an array
 
-            print(wrnumber, wvalues)
             client = ModbusClient(host=ipAdress, port = 502)
+
+            client.open()
 
             client.write_multiple_registers(wrnumber, wvalues)
             self.writeRModbus = None # discharge past values
