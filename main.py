@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem, QApplication, QLabel, QWidget
 import sys
 
-from registerRecording import *
+
 from newregisters import *
 
 from modbus import Ui_MainWindow
@@ -79,11 +79,23 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         #self.ui._lstWrite.itemClicked.connect(self.dragAndDroptoTable) additional features
 
-        #self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget)
+        self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget)
          
         self.ui._tableWrite.itemActivated.connect(self.storeData)  # past value
 
         self.ui._tableWrite.itemClicked.connect(self.storeData) # new value
+
+        self.ui.btn_Find.clicked.connect(self.querySingleElement)
+
+    def querySingleElement(self):
+
+        element = self.ui.lne_registerNW.text()
+
+        print(element)
+        curs = self.conn.cursor()
+        curs.execute("SELECT * FROM registers WHERE (Register Function=?)", (element))
+      
+        print(curs)
 
     def storeData(self, item):
         
@@ -147,29 +159,34 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         col2 = 1
 
-        temp = item.text()
+        try:
 
-        tempP = int(re.search(r'\d+', temp).group())
+            temp = item.text()
 
-        client = ModbusClient(host=ipAdress, port = 502)
+            tempP = int(re.search(r'\d+', temp).group())
 
-        client.open()
+            client = ModbusClient(host=ipAdress, port = 502)
 
-        readValuefromRegister = client.read_holding_registers(tempP, 1)   # column2 value must be this, change when you are doing simulation
+            client.open()
 
-        for item in row_1:
+            readValuefromRegister = client.read_holding_registers(tempP, 1)   # column2 value must be this, change when you are doing simulation
 
-            cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
-            self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
+            for item in row_1:
 
-        for item in row_1:
+                cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
 
-            cell = QTableWidgetItem(str(readValuefromRegister))# makes the item to be QTableWidgetItem 
-            self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
+            for item in row_1:
+
+                cell = QTableWidgetItem(str(readValuefromRegister))# makes the item to be QTableWidgetItem 
+                self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
+        
+        except:
+            pass
 
     def modbusWriteFunction(self, item):
 
-        ipAdress = self.ui._lneIp.text() # ip adresi
+        ipAdress = self.ui._lneIp.text() # ip adress
         try:
             wrnumber = int(re.search(r'\d+', self.writeRModbus).group())
 
@@ -188,28 +205,33 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         except:
             pass
     
+    def newRegistersWidget(self):
+        
+        widget.setCurrentIndex(widget.currentIndex()+1)
+
     # Drag and Drop helper function
     # def mouseMoveEvent(self, event):
         #print("Erhan2")
         #return [event.x(), event.y()]
         #print('Mouse coords: ( %d : %d )' % (event.x(), event.y()))
 
-class RecordingRegisters(QWidget, Ui_Form):
-
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_Form()
-
-        self.ui.setupUi(self)
 
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
+    widget = QtWidgets.QStackedWidget()
+
     app.setApplicationDisplayName("Modbus")
 
     mainPage = ModbusMainWindow()
 
-    mainPage.show()
+
+    widget.addWidget(mainPage)
+
+    widget.setFixedHeight(900)
+    widget.setFixedWidth(1200)
+
+    widget.show()
 
     sys.exit(app.exec_())

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'modbus.ui'
+# Form implementation generated from reading ui file 'ui\modbus.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1147, 849)
+        MainWindow.resize(1149, 829)
         MainWindow.setStyleSheet("QToolTip\n"
 "{\n"
 "     border: 1px solid black;\n"
@@ -594,12 +594,12 @@ class Ui_MainWindow(object):
         self.label_3 = QtWidgets.QLabel(self.horizontalLayoutWidget_2)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.horizontalLayoutWidget_2)
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.horizontalLayout_2.addWidget(self.lineEdit_2)
-        self.pushButton = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_2.addWidget(self.pushButton)
+        self.lne_registerNW = QtWidgets.QLineEdit(self.horizontalLayoutWidget_2)
+        self.lne_registerNW.setObjectName("lne_registerNW")
+        self.horizontalLayout_2.addWidget(self.lne_registerNW)
+        self.btn_Find = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.btn_Find.setObjectName("btn_Find")
+        self.horizontalLayout_2.addWidget(self.btn_Find)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
@@ -688,9 +688,33 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.addLayout(self.verticalLayout_4)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_6.addLayout(self.verticalLayout_3)
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(790, 40, 221, 80))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.pushButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.pushButton.setObjectName("pushButton")
+        self.horizontalLayout_9.addWidget(self.pushButton)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_9)
+        self.horizontalLayout_10 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_10.setObjectName("horizontalLayout_10")
+        self.label_10 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.label_10.setFont(font)
+        self.label_10.setObjectName("label_10")
+        self.horizontalLayout_10.addWidget(self.label_10)
+        self.lineEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.lineEdit.setObjectName("lineEdit")
+        self.horizontalLayout_10.addWidget(self.lineEdit)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_10)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1147, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1149, 26))
         self.menubar.setObjectName("menubar")
         self.menuPages = QtWidgets.QMenu(self.menubar)
         self.menuPages.setObjectName("menuPages")
@@ -716,7 +740,7 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Modbus Master"))
         self.label_4.setText(_translate("MainWindow", "Write"))
         self.label_3.setText(_translate("MainWindow", "Register Number :"))
-        self.pushButton.setText(_translate("MainWindow", "Find"))
+        self.btn_Find.setText(_translate("MainWindow", "Find"))
         self.label_7.setText(_translate("MainWindow", "Register Distance :"))
         self.pushButton_3.setText(_translate("MainWindow", "Search"))
         self.label_5.setText(_translate("MainWindow", "Read"))
@@ -724,6 +748,8 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(_translate("MainWindow", "Find"))
         self.label_8.setText(_translate("MainWindow", "Register Distance :"))
         self.pushButton_4.setText(_translate("MainWindow", "Search"))
+        self.pushButton.setText(_translate("MainWindow", "Start Recording"))
+        self.label_10.setText(_translate("MainWindow", "Clock (/sn)"))
         self.menuPages.setTitle(_translate("MainWindow", "Pages"))
         self.actionRecording_Registers.setText(_translate("MainWindow", "Recording Registers"))
         self.actionNew_Registers.setText(_translate("MainWindow", "New Registers"))
