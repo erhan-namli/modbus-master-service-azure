@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>990</width>
-    <height>739</height>
+    <width>1003</width>
+    <height>829</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -539,7 +539,7 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>90</y>
+      <y>150</y>
       <width>251</width>
       <height>61</height>
      </rect>
@@ -565,8 +565,8 @@ QAbstractSpinBox {
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>10</y>
+      <x>440</x>
+      <y>0</y>
       <width>211</width>
       <height>51</height>
      </rect>
@@ -584,7 +584,7 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>760</x>
-      <y>160</y>
+      <y>220</y>
       <width>221</width>
       <height>80</height>
      </rect>
@@ -593,7 +593,7 @@ QAbstractSpinBox {
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
-        <widget class="QPushButton" name="btn_Recording">
+        <widget class="QPushButton" name="pushButton">
          <property name="text">
           <string>Start Recording</string>
          </property>
@@ -616,7 +616,7 @@ QAbstractSpinBox {
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="btn_Clock"/>
+        <widget class="QLineEdit" name="lineEdit"/>
        </item>
       </layout>
      </item>
@@ -626,8 +626,8 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>300</y>
-      <width>181</width>
+      <y>360</y>
+      <width>171</width>
       <height>171</height>
      </rect>
     </property>
@@ -642,18 +642,7 @@ QAbstractSpinBox {
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="cmb_Funct">
-         <item>
-          <property name="text">
-           <string>Writable</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Readable</string>
-          </property>
-         </item>
-        </widget>
+        <widget class="QLineEdit" name="lne_Funct"/>
        </item>
       </layout>
      </item>
@@ -683,26 +672,21 @@ QAbstractSpinBox {
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>260</y>
-      <width>131</width>
-      <height>31</height>
+      <x>820</x>
+      <y>330</y>
+      <width>81</width>
+      <height>21</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
     </property>
     <property name="text">
      <string>New Registers</string>
     </property>
    </widget>
-   <widget class="QTableWidget" name="table_Registers">
+   <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>160</y>
+      <y>220</y>
       <width>381</width>
       <height>489</height>
      </rect>
@@ -714,24 +698,21 @@ QAbstractSpinBox {
     <column/>
     <column/>
    </widget>
-   <widget class="QListWidget" name="list_Registers">
+   <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>160</y>
+      <y>220</y>
       <width>311</width>
       <height>411</height>
      </rect>
-    </property>
-    <property name="modelColumn">
-     <number>0</number>
     </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>580</y>
+      <y>640</y>
       <width>311</width>
       <height>24</height>
      </rect>
@@ -745,12 +726,12 @@ QAbstractSpinBox {
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lne_registerNumberAdd"/>
+      <widget class="QLineEdit" name="lne_registerNW_2"/>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_Find">
+      <widget class="QPushButton" name="btn_Find_2">
        <property name="text">
-        <string>Add</string>
+        <string>Find</string>
        </property>
       </widget>
      </item>
@@ -760,7 +741,7 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>620</y>
+      <y>680</y>
       <width>311</width>
       <height>24</height>
      </rect>
@@ -802,29 +783,22 @@ QAbstractSpinBox {
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="btn_Delete">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>660</y>
-      <width>181</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delete Register from Table</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>990</width>
+     <width>1003</width>
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuPages">
+    <property name="title">
+     <string>Pages</string>
+    </property>
+   </widget>
+   <addaction name="menuPages"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionRecording_Registers">

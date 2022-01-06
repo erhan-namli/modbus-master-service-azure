@@ -75,17 +75,53 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui._lstRead.itemActivated.connect(self.addRegistertoRTableFunc)
 
-        self.ui._tableWrite.itemChanged.connect(self.modbusWriteFunction)
+        self.ui._tableWrite.itemChanged.connect(self.tempFuncContinue)
 
         #self.ui._lstWrite.itemClicked.connect(self.dragAndDroptoTable) additional features
 
         self.ui.actionNew_Registers.triggered.connect(self.newRegistersWidget)
          
-        self.ui._tableWrite.itemActivated.connect(self.storeData)  # past value
+        # self.ui._tableWrite.itemActivated.connect(self.storeData)  # past value
 
-        self.ui._tableWrite.itemClicked.connect(self.storeData) # new value
+        # self.ui._tableWrite.itemClicked.connect(self.storeData) # new value
 
         self.ui.btn_Find.clicked.connect(self.querySingleElement)
+
+        self.ui._tableWrite.itemSelectionChanged.connect(self.tempFunc)
+
+    def tempFunc(self):
+        
+        print("1")
+        a = self.ui._tableWrite.selectedItems()
+
+        self.writeRModbus = a[0].text()
+
+        print(self.writeRModbus)
+
+    def tempFuncContinue(self, item):
+
+        print(item.text())
+        
+        ipAdress = self.ui._lneIp.text() # ip adress
+        try:
+            wrnumber = int(re.search(r'\d+', self.writeRModbus).group())
+
+            temp = item.text()
+
+            tempP = int(re.search(r'\d+', temp).group())
+
+            wvalues = [tempP]  # must be array type because write_multiple_registers function takes this paramater as an array
+
+            client = ModbusClient(host=ipAdress, port = 502)
+
+            client.open()
+
+            client.write_multiple_registers(wrnumber, wvalues)
+            self.writeRModbus = None # discharge past values
+        except:
+            pass
+
+        
 
     def querySingleElement(self):
 
@@ -121,6 +157,11 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     
     def addRegistertoWTableFunc(self, item):
 
+        # TO - DO
+        # Firstly read that register's past value if it has, if it's not fill with empty
+
+        ipAdress = self.ui._lneIp.text() # ip adresi
+
         row_1 = [item.text()]
 
         row = self.ui._tableWrite.rowCount()  #  gets table row count
@@ -131,19 +172,25 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         col = 0
 
-        col2 = 1
-
+    
         for item in row_1:  # First columns item
 
             cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
-        
+            
             self.ui._tableWrite.setItem(row, col, cell)  # set item to declared row and col index
-
-        for item in row_1:   # Second columns item
-
-            cell = QTableWidgetItem(str(item))   # makes the item to be QTableWidgetItem
+            
+        # Read Function
         
-            self.ui._tableWrite.setItem(row, col2, cell)  # set item to declared row and col index
+        falan = row_1[0]
+       
+        pastRegisterValue = int(re.search(r'\d+', falan).group())
+        
+        print(pastRegisterValue)
+
+        client = ModbusClient(host=ipAdress, port = 502)
+        #cell = QTableWidgetItem(str(nowr))   # makes the item to be QTableWidgetItem
+        
+        #self.ui._tableWrite.setItem(row, col2, cell)  # set item to declared row and col index
 
     def addRegistertoRTableFunc(self, item):
 
@@ -176,10 +223,10 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
                 cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
                 self.ui._tableRead.setItem(row, col, cell)# set item to declared row and col index
 
-            for item in row_1:
+            # for item in row_1:
 
-                cell = QTableWidgetItem(str(readValuefromRegister))# makes the item to be QTableWidgetItem 
-                self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
+            #     cell = QTableWidgetItem(str(readValuefromRegister))# makes the item to be QTableWidgetItem 
+            #     self.ui._tableRead.setItem(row, col2, cell)# set item to declared row and col index
         
         except:
             pass
