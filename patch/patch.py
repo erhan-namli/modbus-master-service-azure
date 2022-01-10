@@ -108,6 +108,10 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def __init__(self, parent=None):
 
+        client = ModbusClient(host="192.168.1.102", port = 502)
+
+        client.open()
+
         self.changedValue = None
 
         conn = sqlite3.connect('databasev2.db')
@@ -122,12 +126,55 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.table_Registers.setHorizontalHeaderLabels(["Register Name", "Register Function", "Register Value"])
 
-        curs.execute("SELECT RegisterNumber FROM registers")
+        curs.execute("SELECT RegisterNumber, RegisterFunction FROM registers ORDER BY RegisterNumber")
 
         for row in curs.fetchall():
 
             self.ui.list_Registers.addItem("Register " + str(row[0]))
 
+            ######## TEMP
+
+            
+            rowCount = self.ui.table_Registers.rowCount() #  gets table row count
+
+            self.ui.table_Registers.setRowCount(rowCount+1) #  increment the row count
+
+            col3 = 2
+
+            col2 = 1
+
+            col=0
+       
+
+            row_1 = [row[0]]
+            row_2 = [row[1]]
+
+            # Register Name Column
+            for item in row_1:
+
+                cell = QTableWidgetItem("Register " + str(item))# makes the item to be QTableWidgetItem 
+                self.ui.table_Registers.setItem(rowCount, col, cell)# set item to declared row and col index
+            
+            # Register Function Column
+            for item in row_2:
+
+                cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                self.ui.table_Registers.setItem(rowCount, col2, cell)# set item to declared row and col index
+
+            # Register Value Column ( modbus tcp/ip )
+
+            try:
+
+                readValuefromRegister = client.read_holding_registers(row_1, 1)
+
+                for item in [readValuefromRegister]:
+                    cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                    self.ui.table_Registers.setItem(row, col3, cell)# set item to declared row and col index
+                pass
+            except:
+
+                pass
+        
         #----------- Signal - Slot ------------#
 
         self.ui.btn_Insert.clicked.connect(self.insertRegister)
@@ -278,8 +325,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.thread = QThread()
 
         self.worker = Worker(self.ui._lneIp.text())
-
-
 
         self.dfTempRegisters = pd.DataFrame()
         
