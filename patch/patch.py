@@ -45,6 +45,11 @@ class Worker(QObject):
 
     finished = pyqtSignal()
     progress = pyqtSignal(int)
+    def __init__(self,  ipAdress):
+        super(QObject, self).__init__()
+        self.ipAdress = ipAdress
+
+        print(self.ipAdress)
 
     def message_handler(self, message):
 
@@ -60,7 +65,7 @@ class Worker(QObject):
         
         print(newlist)
 
-        client = ModbusClient(host="192.168.1.102", port = 502)
+        client = ModbusClient(host=self.ipAdress, port = 502)
 
         client.open()
 
@@ -79,7 +84,7 @@ class Worker(QObject):
 
             tempDf = pd.DataFrame()
 
-            client = ModbusClient(host="192.168.1.102", port = 502)
+            client = ModbusClient(host=self.ipAdress, port = 502)
 
             client.open()
 
@@ -272,7 +277,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.thread = QThread()
 
-        self.worker = Worker()
+        self.worker = Worker(self.ui._lneIp.text())
 
 
 
