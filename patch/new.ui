@@ -586,7 +586,7 @@ QAbstractSpinBox {
       <x>760</x>
       <y>160</y>
       <width>221</width>
-      <height>80</height>
+      <height>88</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -595,7 +595,7 @@ QAbstractSpinBox {
        <item>
         <widget class="QPushButton" name="btn_Recording">
          <property name="text">
-          <string>Start Recording</string>
+          <string>Start Communication with Azure</string>
          </property>
         </widget>
        </item>
@@ -619,6 +619,13 @@ QAbstractSpinBox {
         <widget class="QLineEdit" name="btn_Clock"/>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_StopCommunication">
+       <property name="text">
+        <string>Stop Communication with Azure</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -805,7 +812,7 @@ QAbstractSpinBox {
    <widget class="QPushButton" name="btn_Delete">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>30</x>
       <y>660</y>
       <width>181</width>
       <height>28</height>
@@ -813,6 +820,32 @@ QAbstractSpinBox {
     </property>
     <property name="text">
      <string>Delete Register from Table</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_AllRegisters">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>650</y>
+      <width>121</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add All Registers</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_ClearAll">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>660</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear All</string>
     </property>
    </widget>
   </widget>

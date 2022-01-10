@@ -1,3 +1,4 @@
+from typing import Text
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
@@ -13,6 +14,8 @@ from newMainPage import Ui_MainWindow
 
 from pyModbusTCP.client import ModbusClient
 
+import threading
+
 import re
 
 import sqlite3
@@ -20,6 +23,8 @@ import sqlite3
 import pandas as pd
 
 from azure.iot.device import IoTHubDeviceClient, Message
+
+from PyQt5.QtWidgets import QMessageBox
 
 CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE="
 
@@ -55,7 +60,7 @@ class Worker(QObject):
         
         print(newlist)
 
-        client = ModbusClient(host="192.168.1.200", port = 502)
+        client = ModbusClient(host="192.168.1.102", port = 502)
 
         client.open()
 
@@ -68,13 +73,13 @@ class Worker(QObject):
         registers = dfRegNumbers['Registers']
 
 
-        for i in range(1000):
+        while True:
 
-            clientAzure.on_message_received = self.message_handler
+            clientAzure.on_message_received = self.message_handler  #When azure sends message to our client do that function
 
             tempDf = pd.DataFrame()
 
-            client = ModbusClient(host="192.168.1.200", port = 502)
+            client = ModbusClient(host="192.168.1.102", port = 502)
 
             client.open()
 
@@ -90,26 +95,17 @@ class Worker(QObject):
 
             clientAzure.send_message(str(message))
             
-            time.sleep(3)
-
-
-        for i in range(100):
-
-            time.sleep(1)
-
-            print(i)
-
-            self.progress.emit(i + 1)
+            time.sleep(5)
         
-        self.finished.emit()
+        #self.finished.emit()
 
 class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def __init__(self, parent=None):
 
-        conn = sqlite3.connect('databasev2.db')
+        self.changedValue = None
 
-        
+        conn = sqlite3.connect('databasev2.db')
 
         curs = conn.cursor()
 
@@ -118,9 +114,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.ui = Ui_MainWindow()
 
         self.ui.setupUi(self)
-
-        
-
 
         self.ui.table_Registers.setHorizontalHeaderLabels(["Register Name", "Register Function", "Register Value"])
 
@@ -144,6 +137,132 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.table_Registers.itemChanged.connect(self.writeRegister)
 
+        self.ui.btn_AllRegisters.clicked.connect(self.addAllRegisters)
+
+        self.ui.btn_ClearAll.clicked.connect(self.clearAllRows)
+
+        self.ui.btn_StopCommunication.clicked.connect(self.stopCommunication)
+
+        self.ui.table_Registers.itemClicked.connect(self.getRegisterValue)
+
+        self.ui.table_Registers.itemChanged.connect(self.changeRegisterValue)
+
+    def changeRegisterValue(self, item):
+
+        value = item.text()
+
+        if self.changedValue == None:
+
+            pass
+    
+        else:
+
+            client = ModbusClient(host=self.ui._lneIp.text(), port = 502)
+
+            client.open()
+
+            client.write_multiple_registers(self.changedValue, [int(value)])
+
+        self.changedValue  = None
+
+    def getRegisterValue(self):
+
+        rows = {index.row() for index in self.ui.table_Registers.selectionModel().selectedIndexes()}
+        output = []
+        for row in rows:
+            row_data = []
+            for column in range(self.ui.table_Registers.model().columnCount()):
+                index = self.ui.table_Registers.model().index(row, column)
+                row_data.append(index.data())
+            output.append(row_data)
+
+        self.changedValue = int(re.search(r'\d+', output[0][0]).group())
+        print(self.changedValue)
+
+        
+
+    def stopCommunication(self):
+
+        #print(threading.Thread.is_alive())
+        print("Durdu")
+
+        pass
+
+
+
+    def clearAllRows(self):
+
+        self.ui.table_Registers.setRowCount(0)
+
+    def addAllRegisters(self):
+
+        def falan(x):
+            
+            return int(re.search(r'\d+', x).group())
+
+        items = [self.ui.list_Registers.item(x).text() for x in range(self.ui.list_Registers.count())]
+
+        tempItems = list(map(falan, items))
+
+        print(tempItems)
+
+        for i in tempItems:
+
+            # SQL QUERY
+            curs.execute("SELECT * FROM registers WHERE (RegisterNumber=?)",(i, )) # we need comma after the variable because it is what is 
+            conn.commit()
+
+            ####### Adding Registers To Table Function #######
+
+            ipAdress = self.ui._lneIp.text() # ip adresi
+
+            for satirIndeks, satirVeri in enumerate(curs):
+                row = self.ui.table_Registers.rowCount() #  gets table row count
+
+                self.ui.table_Registers.setRowCount(row+1) #  increment the row count
+
+                col3 = 2
+
+                col2 = 1
+
+                col=0
+
+
+                row_1 = [satirVeri[2]]
+                row_2 = [satirVeri[1]]
+
+                # Register Name Column
+                for item in row_1:
+
+                    cell = QTableWidgetItem("Register " + str(item))# makes the item to be QTableWidgetItem 
+                    self.ui.table_Registers.setItem(row, col, cell)# set item to declared row and col index
+                
+                # Register Function Column
+                for item in row_2:
+
+                    cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                    self.ui.table_Registers.setItem(row, col2, cell)# set item to declared row and col index
+
+                # Register Value Column ( modbus tcp/ip )
+
+                try:
+                    client = ModbusClient(host=ipAdress, port = 502)
+
+                    client.open()
+
+                    readValuefromRegister = client.read_holding_registers(int(i), 1)
+
+                    for item in [readValuefromRegister]:
+                        cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                        self.ui.table_Registers.setItem(row, col3, cell)# set item to declared row and col index
+                    pass
+                except:
+
+                    pass
+            
+            pass
+
+
 
     def writeRegister(self):
 
@@ -151,13 +270,18 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def runLongTask(self):
 
+        self.thread = QThread()
+
+        self.worker = Worker()
+
+
+
         self.dfTempRegisters = pd.DataFrame()
         
         data = []
         for i in range(self.ui.table_Registers.rowCount()):
             data.append(int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group()))
             #data.append(self.ui.table_Registers.item(i, 0).text())
-        print(data)
 
         self.dfTempRegisters['Registers'] = data
 
@@ -165,13 +289,10 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         #int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group())
 
-        self.thread = QThread()
-
-        self.worker = Worker()
-
         self.worker.moveToThread(self.thread)
 
         self.thread.started.connect(self.worker.run)
+
 
         self.worker.finished.connect(self.thread.quit)
 
@@ -181,36 +302,10 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.thread.start()
 
-    def runWriteLongTask(self):
-        
-        data = []
-        for i in range(self.ui.table_Registers.rowCount()):
-            data.append(int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group()))
-            #data.append(self.ui.table_Registers.item(i, 0).text())
-        print(data)
-
-        self.dfTempRegisters['Registers'] = data
-
-        self.dfTempRegisters.to_csv("nope.csv")
-
-        #int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group())
-
-        self.thread = QThread()
-
-        self.worker = Worker()
-
-        self.worker.moveToThread(self.thread)
-
-        self.thread.started.connect(self.worker.run)
-
-        self.worker.finished.connect(self.thread.quit)
-
-        self.worker.finished.connect(self.worker.deleteLater)
-
-        self.thread.finished.connect(self.thread.deleteLater)
-
-        self.thread.start()
-
+        if(self.thread.isRunning()):
+            print("Çalışıyor")
+        else:
+            print("Çalışmıyor")
 
     def querySingleElement(self):
         
@@ -302,8 +397,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         # Select unique row which has belongs to taken register number and set the first 2 column with sql query, then the 3th column has to be readed value
 
-        
-
         ipAdress = self.ui._lneIp.text() # ip adresi
 
         register = item.text()
@@ -367,8 +460,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         
         pass
             
-
-
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
