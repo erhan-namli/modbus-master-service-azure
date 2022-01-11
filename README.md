@@ -1,9 +1,13 @@
-# modbus-tcp-gui
- In this repository I created a GUI for Modbus TCP/IP
+# Modbus TCP/IP - IoT - GUI
+  
  
- # Libraries
- <a href="https://www.qt.io/"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/>  </a>
+ ## Libraries
+ - GUI library : https://pypi.org/project/PyQt5/
+ - Database : https://www.sqlite.org/index.html
+ - Modbus Protocol Library : https://pypi.org/project/pymodbus/
+ - Azure Communication Library : https://github.com/Azure/azure-sdk-for-python
+
+ ## Azure Communication
  
- # Azure Communication
  
- # Work Principle
+ ## Work Principle
