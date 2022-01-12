@@ -13,8 +13,8 @@
  - Send cloud-to-device messages with IoT Hub : https://docs.microsoft.com/en-gb/azure/iot-hub/iot-hub-python-python-c2d
  
  ### Code Examples
+ #### Send data to Azure IoT hub from device
  ```python
- # SENDING DATA TO MICROSOFT AZURE CLOUD SERVICE
 
 # 1- First thing you have to do is go Azure portal and open bash command line then write az iot hub monitor-events --hub-name modbus-tcp-iot --device-id mypi
 # 2- this command starts monitoring for your device
