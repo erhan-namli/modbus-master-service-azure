@@ -1,6 +1,4 @@
 # Modbus TCP/IP - IoT - GUI
-  
-
 
 ![Screenshot](app.PNG)
 
@@ -84,3 +82,5 @@ if __name__ == '__main__':
     #getDatafromAzure()
  ```
  ## Work Principle
+ 
+ -You can just enter the ip address of the connected slave device and start reading the register values.
