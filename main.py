@@ -26,7 +26,7 @@ from azure.iot.device import IoTHubDeviceClient, Message
 
 from PyQt5.QtWidgets import QMessageBox
 
-CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE="
+CONNECTION_STRING = "CONNECTION STRING" # Azure IoT Hub Device Key
 
 clientAzure = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
 
@@ -317,8 +317,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
                     pass
             
             pass
-
-
 
     def writeRegister(self):
 
