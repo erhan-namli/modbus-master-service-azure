@@ -1,6 +1,7 @@
 # Modbus TCP/IP - IoT - GUI
-  
- 
+
+![Screenshot](app.PNG)
+
  ## Libraries
  - GUI library : https://pypi.org/project/PyQt5/
  - Database : https://www.sqlite.org/index.html
@@ -81,3 +82,5 @@ if __name__ == '__main__':
     #getDatafromAzure()
  ```
  ## Work Principle
+ 
+ -You can just enter the ip address of the connected slave device and start reading the register values.
