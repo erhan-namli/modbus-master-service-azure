@@ -1,6 +1,6 @@
 # Modbus TCP/IP - IoT - GUI
   
- 
+ ![alt text](https://github.com/erhan-namli/modbusMaster/blob/master/app.PNG?raw=true)
  ## Libraries
  - GUI library : https://pypi.org/project/PyQt5/
  - Database : https://www.sqlite.org/index.html
