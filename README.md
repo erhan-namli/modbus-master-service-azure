@@ -1,6 +1,6 @@
 # Modbus TCP/IP - IoT - GUI
 
-![Screenshot](app.PNG)
+![Screenshot](photos/IMG-4930.jpg)
 
  ## Libraries
  - GUI library : https://pypi.org/project/PyQt5/
