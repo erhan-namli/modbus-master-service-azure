@@ -43,15 +43,15 @@ sorguOlustur = ("""CREATE TABLE IF NOT EXISTS registers(Id INTEGER NOT NULL PRIM
 curs.execute(sorguOlustur)
 conn.commit()
 
-class Worker(QObject):
+class Worker(QtCore.QThread):
 
-    finished = pyqtSignal()
-    progress = pyqtSignal(int)
-    def __init__(self,  ipAdress):
-        super(QObject, self).__init__()
+    any_signal = QtCore.pyqtSignal(int)
+
+    def __init__(self,parent=None,  ipAdress=None):
+        super(QtCore.QThread, self).__init__()
         self.ipAdress = ipAdress
 
-        print(self.ipAdress)
+        self.is_running = True
 
     def message_handler(self, message):
 
@@ -82,6 +82,8 @@ class Worker(QObject):
 
         while True:
 
+            print("Erhan")
+
             clientAzure.on_message_received = self.message_handler  #When azure sends message to our client do that function
 
             tempDf = pd.DataFrame()
@@ -103,8 +105,12 @@ class Worker(QObject):
             clientAzure.send_message(str(message))
             
             time.sleep(0.1)
-        
-        #self.finished.emit()
+    
+    def stop(self):
+
+        self.is_running = False
+
+        self.terminate()
 
 class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
@@ -143,6 +149,8 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_Insert.clicked.connect(self.insertRegister)
 
+        self.thread={}
+
         self.ui.list_Registers.itemActivated.connect(self.addRegisterstoTable)  # item activated = double click
 
         self.ui.btn_Delete.clicked.connect(self.deleteRegisterFromTable)
@@ -165,17 +173,18 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_addiptolist.clicked.connect(self.addIpToIpList)
 
-        
+        self.ui.btn_StopCommunication.clicked.connect(self.stop_AllThreads)
+
 
     def addIpToIpList(self):
 
-        AllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
+        sAllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
 
-        print(AllItems)
+        print(sAllItems)
 
         new = self.ui._lneIp.text()
 
-        if new not in AllItems:
+        if new not in sAllItems:
 
             self.ui.cmb_deviceList.addItem(new)
 
@@ -312,35 +321,35 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         pass
 
     def runLongTask(self):
-
-        self.thread = QThread()
-
-        self.worker = Worker(self.ui._lneIp.text())
-
-        self.dfTempRegisters = pd.DataFrame()
         
         data = []
         for i in range(self.ui.table_Registers.rowCount()):
             data.append(int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group()))
-            #data.append(self.ui.table_Registers.item(i, 0).text())
-
+            
+        self.dfTempRegisters = pd.DataFrame()
         self.dfTempRegisters['Registers'] = data
 
         self.dfTempRegisters.to_csv("nope.csv")
 
-        #int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group())
+        print("Erhan2")
 
-        self.worker.moveToThread(self.thread)
+        length = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
 
-        self.thread.started.connect(self.worker.run)
+        for i in range(len(length)):
+            print("Erhan1")
+            self.thread[i] = Worker(parent=None, ipAdress=length[i])
 
-        self.worker.finished.connect(self.thread.quit)
+            self.thread[i].start()
 
-        self.worker.finished.connect(self.worker.deleteLater)
+    def stop_AllThreads(self):
 
-        self.thread.finished.connect(self.thread.deleteLater)
+        length = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
 
-        self.thread.start()
+        for i in range(len(length)):
+
+            self.thread[i].stop()
+
+            print("Durdu")
 
     def querySingleElement(self):
         
