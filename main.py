@@ -169,7 +169,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def addIpToIpList(self):
 
-        
         AllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
 
         print(AllItems)

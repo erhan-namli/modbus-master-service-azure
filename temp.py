@@ -1,33 +1,8 @@
-import sys       
-from PyQt5.QtWidgets import QApplication, QWidget, QListWidget, QListWidgetItem
-from PyQt5.QtCore import Qt
+from pyModbusTCP.client import ModbusClient
 
-class AppDemo(QListWidget):
-    def __init__(self):
-        super().__init__()
-        self.resize(1200, 800)
-        self.setStyleSheet('font-size: 40px')
 
-        items = ['Item 1', 'Item 2', 'Item 3', 'Item 4']
-        toDisable = [True, True, False, False]
+client = ModbusClient(host="192.168.1.200", port = 502)
 
-        for item, disable in zip(items, toDisable):
-            lstItem = QListWidgetItem(item)
+client.open()
 
-            if disable:
-                lstItem.setFlags(Qt.NoItemFlags)
-            self.addItem(lstItem)
-        
-        self.itemPressed.connect(self.getItem)
-        # self.itemClicked.connect(self.getItem)
-
-    def getItem(self, itm):
-        print(itm.text())
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    demo = AppDemo()
-    demo.show()
-    
-    sys.exit(app.exec_())
+print(client.read_holding_registers(1, 5))
