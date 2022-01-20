@@ -1,10 +1,10 @@
 from typing import Text
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem, QApplication, QLabel, QWidget
 import sys
-from PyQt5.QtCore import QObject, QThread, pyqtSignal # Threading Classes
+from PyQt5.QtCore import  QObject, QThread, pyqtSignal # Threading Classes
 
 import time
 
@@ -26,7 +26,9 @@ from azure.iot.device import IoTHubDeviceClient, Message
 
 from PyQt5.QtWidgets import QMessageBox
 
-CONNECTION_STRING = "CONNECTION STRING" # Azure IoT Hub Device Key
+from PyQt5.QtCore import Qt
+
+CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE=" # Azure IoT Hub Device Key
 
 clientAzure = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
 
@@ -109,7 +111,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self, parent=None):
 
         
-
         client = ModbusClient(host="192.168.1.200", port = 502)
         
         client.open()
@@ -138,47 +139,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             ######## TEMP
 
-            
-            rowCount = self.ui.table_Registers.rowCount() #  gets table row count
-
-            self.ui.table_Registers.setRowCount(rowCount+1) #  increment the row count
-
-            col3 = 2
-
-            col2 = 1
-
-            col=0
-       
-
-            row_1 = [row[0]]
-            row_2 = [row[1]]
-
-            # Register Name Column
-            for item in row_1:
-
-                cell = QTableWidgetItem("Register " + str(item))# makes the item to be QTableWidgetItem 
-                self.ui.table_Registers.setItem(rowCount, col, cell)# set item to declared row and col index
-            
-            # Register Function Column
-            for item in row_2:
-
-                cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
-                self.ui.table_Registers.setItem(rowCount, col2, cell)# set item to declared row and col index
-
-            # Register Value Column ( modbus tcp/ip )
-
-            try:
-
-                readValuefromRegister = client.read_holding_registers(row_1, 1)
-
-                for item in [readValuefromRegister]:
-                    cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
-                    self.ui.table_Registers.setItem(cell, col3, cell)# set item to declared row and col index
-                pass
-            except:
-
-                pass
-        
         #----------- Signal - Slot ------------#
 
         self.ui.btn_Insert.clicked.connect(self.insertRegister)
@@ -202,6 +162,27 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.ui.table_Registers.itemClicked.connect(self.getRegisterValue)
 
         self.ui.table_Registers.itemChanged.connect(self.changeRegisterValue)
+
+        self.ui.btn_addiptolist.clicked.connect(self.addIpToIpList)
+
+        
+
+    def addIpToIpList(self):
+
+        
+
+        AllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
+
+        print(AllItems)
+
+        new = self.ui._lneIp.text()
+
+        if new not in AllItems:
+
+            self.ui.cmb_deviceList.addItem(new)
+
+            #self.ui.cmb_deviceList.setItemText(self.ui.cmb_deviceList.count()+1, _translate("MainWindow", new))
+
 
     def changeRegisterValue(self, item):
 
@@ -249,6 +230,16 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def clearAllRows(self):
 
         self.ui.table_Registers.setRowCount(0)
+
+        self.ui.list_Registers.clear()
+
+        curs.execute("SELECT RegisterNumber, RegisterFunction FROM registers ORDER BY RegisterNumber")
+
+        for row in curs.fetchall():
+
+            self.ui.list_Registers.addItem("Register " + str(row[0]))
+
+        
 
     def addAllRegisters(self):
 
@@ -345,7 +336,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.thread.started.connect(self.worker.run)
 
-
         self.worker.finished.connect(self.thread.quit)
 
         self.worker.finished.connect(self.worker.deleteLater)
@@ -353,11 +343,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.thread.finished.connect(self.thread.deleteLater)
 
         self.thread.start()
-
-        if(self.thread.isRunning()):
-            print("Çalışıyor")
-        else:
-            print("Çalışmıyor")
 
     def querySingleElement(self):
         
@@ -452,6 +437,8 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         ipAdress = self.ui._lneIp.text() # ip adresi
 
         register = item.text()
+        
+        item.setFlags(Qt.NoItemFlags)
 
         onlyNumber = int(re.search(r'\d+', register).group()) # get only number from string
 

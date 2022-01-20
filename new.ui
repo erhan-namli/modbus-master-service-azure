@@ -539,8 +539,8 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>90</y>
-      <width>251</width>
+      <y>40</y>
+      <width>281</width>
       <height>61</height>
      </rect>
     </property>
@@ -559,6 +559,13 @@ QAbstractSpinBox {
      </item>
      <item>
       <widget class="QLineEdit" name="_lneIp"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_addiptolist">
+       <property name="text">
+        <string>Add to List</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -847,6 +854,33 @@ QAbstractSpinBox {
     <property name="text">
      <string>Clear All</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>100</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Device List :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmb_deviceList"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
