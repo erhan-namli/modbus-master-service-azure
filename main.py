@@ -234,7 +234,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def clearAllRows(self):
 
-        self.stop_AllThreads()
+        if len(self.thread)>0:
+
+            self.stop_AllThreads()
 
         self.ui.table_Registers.setRowCount(0)
 
