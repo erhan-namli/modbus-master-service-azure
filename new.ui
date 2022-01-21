@@ -590,7 +590,7 @@ QAbstractSpinBox {
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>750</x>
       <y>160</y>
       <width>221</width>
       <height>88</height>
@@ -623,7 +623,28 @@ QAbstractSpinBox {
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="btn_Clock"/>
+        <widget class="QComboBox" name="cmb_Clock">
+         <item>
+          <property name="text">
+           <string>0.05</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0.1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>0.2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1.0</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </item>
@@ -639,8 +660,8 @@ QAbstractSpinBox {
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>300</y>
+      <x>770</x>
+      <y>400</y>
       <width>181</width>
       <height>171</height>
      </rect>
@@ -697,8 +718,8 @@ QAbstractSpinBox {
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>260</y>
+      <x>800</x>
+      <y>360</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -879,6 +900,28 @@ QAbstractSpinBox {
      </item>
      <item>
       <widget class="QComboBox" name="cmb_deviceList"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>110</y>
+      <width>371</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Azure Connection String</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneAzureS"/>
      </item>
     </layout>
    </widget>

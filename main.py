@@ -47,11 +47,14 @@ class Worker(QtCore.QThread):
 
     any_signal = QtCore.pyqtSignal(int)
 
-    def __init__(self,parent=None,  ipAdress=None):
+    def __init__(self,parent=None,  ipAdress=None, QTableWidget=None, clock=None):
+
+        self.QTable = QTableWidget
         super(QtCore.QThread, self).__init__()
         self.ipAdress = ipAdress
 
         self.is_running = True
+        self.clock = clock
 
     def message_handler(self, message):
 
@@ -82,8 +85,6 @@ class Worker(QtCore.QThread):
 
         while True:
 
-            print("Erhan")
-
             clientAzure.on_message_received = self.message_handler  #When azure sends message to our client do that function
 
             tempDf = pd.DataFrame()
@@ -94,17 +95,26 @@ class Worker(QtCore.QThread):
 
             data = []
 
+            currentRow = 0
+
+            print(currentRow)
+
             for i in registers:
 
                 readedValuefromRegister = client.read_holding_registers(i, 1)
 
+                self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
+                print(i)
+
                 data.append((i, readedValuefromRegister))
+
+                currentRow +=1
 
             message = Message(data)
 
             clientAzure.send_message(str(message))
             
-            time.sleep(0.1)
+            time.sleep(self.clock)
     
     def stop(self):
 
@@ -147,6 +157,8 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         #----------- Signal - Slot ------------#
 
+        
+
         self.ui.btn_Insert.clicked.connect(self.insertRegister)
 
         self.thread={}
@@ -159,13 +171,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_Recording.clicked.connect(self.runLongTask)
 
-        self.ui.table_Registers.itemChanged.connect(self.writeRegister)
-
         self.ui.btn_AllRegisters.clicked.connect(self.addAllRegisters)
 
         self.ui.btn_ClearAll.clicked.connect(self.clearAllRows)
-
-        self.ui.btn_StopCommunication.clicked.connect(self.stopCommunication)
 
         self.ui.table_Registers.itemClicked.connect(self.getRegisterValue)
 
@@ -223,18 +231,10 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.changedValue = int(re.search(r'\d+', output[0][0]).group())
         print(self.changedValue)
 
-        
-
-    def stopCommunication(self):
-
-        #print(threading.Thread.is_alive())
-        print("Durdu")
-
-        pass
-
-
 
     def clearAllRows(self):
+
+        self.stop_AllThreads()
 
         self.ui.table_Registers.setRowCount(0)
 
@@ -316,11 +316,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             
             pass
 
-    def writeRegister(self):
-
-        pass
-
     def runLongTask(self):
+
+        clock = float(self.ui.cmb_Clock.currentText()) # Azure Communication Clock
         
         data = []
         for i in range(self.ui.table_Registers.rowCount()):
@@ -331,13 +329,11 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.dfTempRegisters.to_csv("nope.csv")
 
-        print("Erhan2")
-
         length = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
 
         for i in range(len(length)):
-            print("Erhan1")
-            self.thread[i] = Worker(parent=None, ipAdress=length[i])
+
+            self.thread[i] = Worker(parent=None, ipAdress=length[i], QTableWidget=self.ui.table_Registers, clock=clock)
 
             self.thread[i].start()
 
