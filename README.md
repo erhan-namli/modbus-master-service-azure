@@ -83,4 +83,6 @@ if __name__ == '__main__':
  ```
  ## Work Principle
  
- -You can just enter the ip address of the connected slave device and start reading the register values.
+ - You need to change the connection password you received from Azure in the main file.
+ 
+ - You can just enter the ip address of the connected slave devices and add to device list every piece of devices then start reading the register values.
