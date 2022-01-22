@@ -93,7 +93,7 @@ class Worker(QtCore.QThread):
 
             client.open()
 
-            data = []
+            data = [self.ipAdress]
 
             currentRow = 0
 
