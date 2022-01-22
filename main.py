@@ -185,6 +185,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_ClearDevices.clicked.connect(self.clearDevices)
 
+
     def addIpToIpList(self):
 
         sAllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
@@ -430,11 +431,16 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             #curs.execute("SELECT RegisterNumber FROM registers")
 
-        for row in curs.fetchall():
-
-            self.ui.list_Registers.addItem("Register" + str(row[0]))
+            curs.execute("SELECT RegisterNumber, RegisterFunction FROM registers ORDER BY RegisterNumber")
+            conn.commit()
+            self.ui.list_Registers.clear()
+            for row in curs.fetchall():
+                
+                self.ui.list_Registers.addItem("Register" + str(row[0]))
         
         registerNumber = self.ui.lne_Number.clear()
+
+        
 
     def addRegisterstoTable(self, item):
 
