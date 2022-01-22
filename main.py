@@ -446,7 +446,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         # Select unique row which has belongs to taken register number and set the first 2 column with sql query, then the 3th column has to be readed value
 
-        ipAdress = self.ui._lneIp.text() # ip adresi
+        #ipAdress = self.ui._lneIp.text() # ip adresi
+
+        ipAdress = self.ui.cmb_deviceList.currentText()
 
         register = item.text()
         
