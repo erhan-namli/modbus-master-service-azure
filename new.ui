@@ -881,13 +881,19 @@ QAbstractSpinBox {
      <rect>
       <x>30</x>
       <y>100</y>
-      <width>231</width>
+      <width>381</width>
       <height>51</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="label_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -899,7 +905,27 @@ QAbstractSpinBox {
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cmb_deviceList"/>
+      <widget class="QComboBox" name="cmb_deviceList">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_ClearDevices">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Clear</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

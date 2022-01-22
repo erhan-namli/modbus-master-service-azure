@@ -183,6 +183,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_StopCommunication.clicked.connect(self.stop_AllThreads)
 
+        self.ui.btn_ClearDevices.clicked.connect(self.clearDevices)
 
     def addIpToIpList(self):
 
@@ -503,6 +504,11 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         
         
         pass
+
+    
+    def clearDevices(self):
+
+        self.ui.cmb_deviceList.clear()
             
 if __name__ == "__main__":
 
