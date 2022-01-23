@@ -2,7 +2,7 @@ from typing import Text
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem, QApplication, QLabel, QWidget
+from PyQt5.QtWidgets import QTableWidget,QTableWidgetItem, QApplication, QLabel, QWidget, QComboBox
 import sys
 from PyQt5.QtCore import  QObject, QThread, pyqtSignal # Threading Classes
 
@@ -47,11 +47,13 @@ class Worker(QtCore.QThread):
 
     any_signal = QtCore.pyqtSignal(int)
 
-    def __init__(self,parent=None,  ipAdress=None, QTableWidget=None, clock=None):
+    def __init__(self,parent=None,  ipAdress=None, QTableWidget=None,QComboBox=None, DeviceID = None, clock=None):
 
         self.QTable = QTableWidget
+        self.QCombo = QComboBox
         super(QtCore.QThread, self).__init__()
         self.ipAdress = ipAdress
+        self.DeviceID = DeviceID
 
         self.is_running = True
         self.clock = clock
@@ -70,7 +72,7 @@ class Worker(QtCore.QThread):
         
         print(newlist)
 
-        client = ModbusClient(host=self.ipAdress, port = 502)
+        client = ModbusClient(host=self.ipAdress, unit_id=self.DeviceID, port = 502)
 
         client.open()
 
@@ -89,7 +91,7 @@ class Worker(QtCore.QThread):
 
             tempDf = pd.DataFrame()
 
-            client = ModbusClient(host=self.ipAdress, port = 502)
+            client = ModbusClient(host=self.ipAdress, unit_id=self.DeviceID, port = 502)
 
             client.open()
 
@@ -103,7 +105,8 @@ class Worker(QtCore.QThread):
 
                 readedValuefromRegister = client.read_holding_registers(i, 1)
 
-                self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
+                if self.QCombo.currentText() == self.ipAdress:
+                    self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
                 print(i)
 
                 data.append((i, readedValuefromRegister))
@@ -127,7 +130,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self, parent=None):
 
         
-        client = ModbusClient(host="192.168.1.200", port = 502)
+        client = ModbusClient(host="192.168.1.200", unit_id=1, port = 502)
         
         client.open()
 
@@ -203,6 +206,8 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def changeRegisterValue(self, item):
 
+        deviceID = int(self.ui.lne_IDNumber.text())
+
         value = item.text()
 
         if self.changedValue == None:
@@ -211,7 +216,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     
         else:
 
-            client = ModbusClient(host=self.ui._lneIp.text(), port = 502)
+            client = ModbusClient(host=self.ui.cmb_deviceList.currentText(), unit_id=deviceID, port = 502)
 
             client.open()
 
@@ -272,7 +277,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             ####### Adding Registers To Table Function #######
 
-            ipAdress = self.ui._lneIp.text() # ip adresi
+            #ipAdress = self.ui._lneIp.text() # ip adresi
+
+            ipAdress = self.cmb_deviceList.currentText()
 
             for satirIndeks, satirVeri in enumerate(curs):
                 row = self.ui.table_Registers.rowCount() #  gets table row count
@@ -304,7 +311,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
                 # Register Value Column ( modbus tcp/ip )
 
                 try:
-                    client = ModbusClient(host=ipAdress, port = 502)
+                    client = ModbusClient(host=ipAdress, unit_id=int(self.lne_IDNumber.text()), port = 502)
 
                     client.open()
 
@@ -337,7 +344,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         for i in range(len(length)):
 
-            self.thread[i] = Worker(parent=None, ipAdress=length[i], QTableWidget=self.ui.table_Registers, clock=clock)
+            self.thread[i] = Worker(parent=None, ipAdress=length[i], QTableWidget=self.ui.table_Registers,QComboBox=self.ui.cmb_deviceList, DeviceID=int(self.ui.lne_IDNumber.text()), clock=clock)
 
             self.thread[i].start()
 
@@ -361,7 +368,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         ####### Adding Registers To Table Function #######
 
-        ipAdress = self.ui._lneIp.text() # ip adresi
+        #ipAdress = self.ui._lneIp.text() # ip adresi
+
+        ipAdress = self.cmb_deviceList.currentText()
 
         for satirIndeks, satirVeri in enumerate(curs):
             row = self.ui.table_Registers.rowCount() #  gets table row count
@@ -393,7 +402,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             # Register Value Column ( modbus tcp/ip )
 
             try:
-                client = ModbusClient(host=ipAdress, port = 502)
+                client = ModbusClient(host=ipAdress,unit_id=int(self.lne_IDNumber.text()), port = 502)
 
                 client.open()
 
@@ -439,8 +448,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
                 self.ui.list_Registers.addItem("Register" + str(row[0]))
         
         registerNumber = self.ui.lne_Number.clear()
-
-        
 
     def addRegisterstoTable(self, item):
 
@@ -493,7 +500,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             # Register Value Column ( modbus tcp/ip )
 
             try:
-                client = ModbusClient(host=ipAdress, port = 502)
+                client = ModbusClient(host=ipAdress,unit_id=int(self.ui.lne_IDNumber.text()), port = 502)
 
                 client.open()
 

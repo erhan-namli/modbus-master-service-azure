@@ -540,7 +540,7 @@ QAbstractSpinBox {
      <rect>
       <x>30</x>
       <y>40</y>
-      <width>281</width>
+      <width>381</width>
       <height>61</height>
      </rect>
     </property>
@@ -561,6 +561,16 @@ QAbstractSpinBox {
       <widget class="QLineEdit" name="_lneIp"/>
      </item>
      <item>
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>ID</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lne_IDNumber"/>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_addiptolist">
        <property name="text">
         <string>Add to List</string>
@@ -572,8 +582,8 @@ QAbstractSpinBox {
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>10</y>
+      <x>420</x>
+      <y>0</y>
       <width>211</width>
       <height>51</height>
      </rect>
