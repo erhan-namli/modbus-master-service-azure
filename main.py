@@ -54,7 +54,6 @@ class Worker(QtCore.QThread):
         super(QtCore.QThread, self).__init__()
         self.ipAdress = ipAdress
         self.DeviceID = DeviceID
-
         self.is_running = True
         self.clock = clock
 
@@ -84,7 +83,6 @@ class Worker(QtCore.QThread):
 
         registers = dfRegNumbers['Registers']
 
-
         while True:
 
             clientAzure.on_message_received = self.message_handler  #When azure sends message to our client do that function
@@ -107,7 +105,6 @@ class Worker(QtCore.QThread):
 
                 if self.QCombo.currentText() == self.ipAdress:
                     self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
-                print(i)
 
                 data.append((i, readedValuefromRegister))
 
@@ -130,7 +127,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self, parent=None):
 
         
-        client = ModbusClient(host="192.168.1.200", unit_id=1, port = 502)
+        client = ModbusClient(host="192.168.1.220", unit_id=1, port = 502)
         
         client.open()
 
@@ -156,11 +153,8 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             self.ui.list_Registers.addItem("Register " + str(row[0]))
 
-            ######## TEMP
 
         #----------- Signal - Slot ------------#
-
-        
 
         self.ui.btn_Insert.clicked.connect(self.insertRegister)
 
@@ -255,8 +249,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             self.ui.list_Registers.addItem("Register " + str(row[0]))
 
-        
-
     def addAllRegisters(self):
 
         def falan(x):
@@ -276,8 +268,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             conn.commit()
 
             ####### Adding Registers To Table Function #######
-
-            #ipAdress = self.ui._lneIp.text() # ip adresi
 
             ipAdress = self.cmb_deviceList.currentText()
 
@@ -382,7 +372,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             col2 = 1
 
             col=0
-
 
             row_1 = [satirVeri[2]]
             row_2 = [satirVeri[1]]
@@ -515,8 +504,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
                 pass
     
     def registerWriteCode(self):
-        
-        
         
         pass
 
