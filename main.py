@@ -28,6 +28,8 @@ from PyQt5.QtWidgets import QMessageBox
 
 from PyQt5.QtCore import Qt
 
+import mysql.connector
+
 CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE=" # Azure IoT Hub Device Key
 
 clientAzure = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
@@ -110,7 +112,14 @@ class Worker(QtCore.QThread):
 
                 currentRow +=1
 
+            
+            dfRegNumbers['RegValue'] = data[1:]
+
+            dfRegNumbers.to_csv('mysqldata.csv')
+
             message = Message(data)
+
+            print(message)
 
             clientAzure.send_message(str(message))
             
@@ -127,7 +136,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self, parent=None):
 
         
-        client = ModbusClient(host="192.168.1.220", unit_id=1, port = 502)
+        client = ModbusClient(host="192.168.1.23", unit_id=1, port = 502)
         
         client.open()
 
@@ -145,14 +154,13 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui._lneIp.setText("192.168.1.200")
 
-        self.ui.table_Registers.setHorizontalHeaderLabels(["Register Name", "Register Function", "Register Value"])
+        self.ui.table_Registers.setHorizontalHeaderLabels(["Parameter No", "Description", "Register Value", " Register Function", "Register Id", "Device Ip"])
 
-        curs.execute("SELECT RegisterNumber, RegisterFunction FROM registers ORDER BY RegisterNumber")
+        curs.execute("""SELECT ParameterNo, Description, RegisterValue, RegisterFunction, RegisterId, DeviceIp  FROM deviceRegisters ORDER BY RegisterId""")
 
         for row in curs.fetchall():
 
-            self.ui.list_Registers.addItem("Register " + str(row[0]))
-
+            self.ui.list_Registers.addItem("Register " + str(row[4]))
 
         #----------- Signal - Slot ------------#
 
@@ -182,7 +190,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         self.ui.btn_ClearDevices.clicked.connect(self.clearDevices)
 
-
     def addIpToIpList(self):
 
         sAllItems = [self.ui.cmb_deviceList.itemText(i) for i in range(self.ui.cmb_deviceList.count())]
@@ -197,7 +204,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             #self.ui.cmb_deviceList.setItemText(self.ui.cmb_deviceList.count()+1, _translate("MainWindow", new))
 
-
     def changeRegisterValue(self, item):
 
         deviceID = int(self.ui.lne_IDNumber.text())
@@ -205,11 +211,9 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         value = item.text()
 
         if self.changedValue == None:
-
             pass
     
         else:
-
             client = ModbusClient(host=self.ui.cmb_deviceList.currentText(), unit_id=deviceID, port = 502)
 
             client.open()
@@ -232,7 +236,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         self.changedValue = int(re.search(r'\d+', output[0][0]).group())
         print(self.changedValue)
 
-
     def clearAllRows(self):
 
         if len(self.thread)>0:
@@ -251,20 +254,20 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def addAllRegisters(self):
 
-        def falan(x):
+        def parseRegisterNumber(x):
             
             return int(re.search(r'\d+', x).group())
 
         items = [self.ui.list_Registers.item(x).text() for x in range(self.ui.list_Registers.count())]
 
-        tempItems = list(map(falan, items))
+        ItemList = list(map(parseRegisterNumber, items))
 
-        print(tempItems)
+        print(ItemList)
 
-        for i in tempItems:
+        for i in ItemList:
 
             # SQL QUERY
-            curs.execute("SELECT * FROM registers WHERE (RegisterNumber=?)",(i, )) # we need comma after the variable because it is what is 
+            curs.execute("SELECT * FROM registers WHERE (RegisterId=?)",(i, )) # we need comma after the variable because it is what is 
             conn.commit()
 
             ####### Adding Registers To Table Function #######
@@ -280,11 +283,13 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
                 col2 = 1
 
-                col=0
-
+                col = 0
 
                 row_1 = [satirVeri[2]]
                 row_2 = [satirVeri[1]]
+                row_3 = [satirVeri[3]]
+
+                print(row_3)
 
                 # Register Name Column
                 for item in row_1:
@@ -334,7 +339,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         for i in range(len(length)):
 
-            self.thread[i] = Worker(parent=None, ipAdress=length[i], QTableWidget=self.ui.table_Registers,QComboBox=self.ui.cmb_deviceList, DeviceID=int(self.ui.lne_IDNumber.text()), clock=clock)
+            self.thread[i] = Worker(parent=None, ipAdress=length[i], QTableWidget=self.ui.table_Registers, QComboBox=self.ui.cmb_deviceList, DeviceID=int(self.ui.lne_IDNumber.text()), clock=clock)
 
             self.thread[i].start()
 
@@ -453,7 +458,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         onlyNumber = int(re.search(r'\d+', register).group()) # get only number from string
 
         # SQL QUERY
-        curs.execute("SELECT * FROM registers WHERE (RegisterNumber=?)",(onlyNumber, )) # we need comma after the variable because it is what is 
+        curs.execute("SELECT * FROM deviceRegisters WHERE (RegisterId=?)",(onlyNumber, )) # we need comma after the variable because it is what is 
         
         conn.commit()
 
@@ -463,28 +468,40 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             row = self.ui.table_Registers.rowCount() #  gets table row count
 
             self.ui.table_Registers.setRowCount(row+1) #  increment the row count
+            
 
-            col3 = 2
+            col1, col2, col3, col4, col5, col6 = 0, 1, 2, 3, 4, 5
 
-            col2 = 1
 
-            col=0
-       
+            row_1, row_2, row_3, row_4, row_5 = [satirVeri[0]], [satirVeri[1]], [satirVeri[3]], [satirVeri[4]], [satirVeri[5]]
 
-            row_1 = [satirVeri[2]]
-            row_2 = [satirVeri[1]]
 
             # Register Name Column
             for item in row_1:
 
-                cell = QTableWidgetItem("Register " + str(item))# makes the item to be QTableWidgetItem 
-                self.ui.table_Registers.setItem(row, col, cell)# set item to declared row and col index
+                cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                self.ui.table_Registers.setItem(row, col1, cell)# set item to declared row and col index
             
             # Register Function Column
             for item in row_2:
 
                 cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
                 self.ui.table_Registers.setItem(row, col2, cell)# set item to declared row and col index
+
+            for item in row_3:
+
+                cell = QTableWidgetItem(str(item))# makes the item to be QTableWidgetItem 
+                self.ui.table_Registers.setItem(row, col4, cell)# set item to declared row and col index
+
+            for item in row_4:
+
+                cell = QTableWidgetItem(str(item))
+                self.ui.table_Registers.setItem(row, col5, cell)
+
+            for item in row_5:
+                cell = QTableWidgetItem(self.ui.cmb_deviceList.currentText()) # get the device id from combo box 
+                self.ui.table_Registers.setItem(row, col6, cell)
+                
 
             # Register Value Column ( modbus tcp/ip )
 
