@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from PyQt5.QtCore import Qt
 
-import mysql.connector
+import json
 
 CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE=" # Azure IoT Hub Device Key
 
@@ -83,7 +83,7 @@ class Worker(QtCore.QThread):
 
         dfRegNumbers = pd.read_csv("nope.csv")
 
-        registers = dfRegNumbers['Registers']
+        registersComesFromTable = dfRegNumbers['Registers']
 
         while True:
 
@@ -95,29 +95,42 @@ class Worker(QtCore.QThread):
 
             client.open()
 
-            data = [self.ipAdress]
+            messageList = []
 
             currentRow = 0
 
             print(currentRow)
 
-            for i in registers:
+            azureRegisterValueList = []
 
-                readedValuefromRegister = client.read_holding_registers(i, 1)
+            azureRegisterIdList = registersComesFromTable
+
+            for register in registersComesFromTable:
+
+                readedValuefromRegister = client.read_holding_registers(register, 1)
+
+                #azureRegisterValueList.append(readedValuefromRegister)
 
                 if self.QCombo.currentText() == self.ipAdress:
                     self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
 
-                data.append((i, readedValuefromRegister))
+                INDIVIDUAL_REGISTER = {"IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister}
+
+                messageList.append(INDIVIDUAL_REGISTER)
 
                 currentRow +=1
 
-            
-            dfRegNumbers['RegValue'] = data[1:]
+            #azureRegisterIdList = ",".join([str(elem) for elem in azureRegisterIdList])
 
-            dfRegNumbers.to_csv('mysqldata.csv')
+            #AZURE_MESSAGE_PURE = {"IpAdress": self.ipAdress, "RegisterIdList": azureRegisterIdList, "RegisterValueList" : str(azureRegisterValueList)}
 
-            message = Message(data)
+            #AZURE_MESSAGE = Message(json.dumps(AZURE_MESSAGE_PURE))
+
+            #print(AZURE_MESSAGE)
+
+            #clientAzure.send_message(str(AZURE_MESSAGE))
+
+            message = Message(json.dumps(messageList))
 
             print(message)
 
@@ -136,7 +149,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self, parent=None):
 
         
-        client = ModbusClient(host="192.168.1.23", unit_id=1, port = 502)
+        client = ModbusClient(host="192.168.1.200", unit_id=1, port = 502)
         
         client.open()
 
@@ -328,7 +341,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
         
         data = []
         for i in range(self.ui.table_Registers.rowCount()):
-            data.append(int(re.search(r'\d+', self.ui.table_Registers.item(i, 0).text()).group()))
+            data.append(int(re.search(r'\d+', self.ui.table_Registers.item(i, 4).text()).group()))
             
         self.dfTempRegisters = pd.DataFrame()
         self.dfTempRegisters['Registers'] = data
