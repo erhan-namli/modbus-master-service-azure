@@ -49,7 +49,7 @@ class Worker(QtCore.QThread):
 
     any_signal = QtCore.pyqtSignal(int)
 
-    def __init__(self,parent=None,  ipAdress=None, QTableWidget=None,QComboBox=None, DeviceID = None, clock=None):
+    def __init__(self,parent=None, ipAdress=None, QTableWidget=None, QComboBox=None, DeviceID = None, clock=None):
 
         self.QTable = QTableWidget
         self.QCombo = QComboBox
@@ -114,7 +114,11 @@ class Worker(QtCore.QThread):
                 if self.QCombo.currentText() == self.ipAdress:
                     self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
 
-                INDIVIDUAL_REGISTER = {"IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister}
+                registerFunction = str(self.QTable.item(currentRow, 3).text())
+
+                print(registerFunction)
+
+                INDIVIDUAL_REGISTER = {"IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister, "RegisterFunction" : registerFunction}
 
                 messageList.append(INDIVIDUAL_REGISTER)
 
