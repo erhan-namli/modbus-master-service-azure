@@ -641,6 +641,11 @@ QAbstractSpinBox {
          </item>
          <item>
           <property name="text">
+           <string>0.5</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>10.0</string>
           </property>
          </item>

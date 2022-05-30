@@ -1,15 +1,27 @@
-from azure.iot.device import IoTHubDeviceClient, Message
+from asyncio.windows_events import NULL
+from pickle import NONE
+import pandas as pd
+import sqlite3
 
-CONNECTION_STRING = "HostName=modbus-tcp-iot.azure-devices.net;DeviceId=mypi;SharedAccessKey=04YUBQsaAofBwwO6uFYfx7J+noaBUWJ35JDNON0pYAE=" # Azure IoT Hub Device Key
+conn = sqlite3.connect('test_database')
+c = conn.cursor()
 
-clientAzure = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
+c.execute('CREATE TABLE IF NOT EXISTS deviceRegisters (ParameterNo, Description, RegisterValue, RegisterFunction, RegisterId, DeviceIp)')
+conn.commit()
 
-def message_handler(message) :
+xl_file = pd.read_excel("webarayuz.xlsx", sheet_name="Sheet1")
 
-    print(message)
+df = pd.DataFrame(xl_file)
 
+df['RegisterFunction'].replace({'Sadece okunabilir' : 'Readable', 'Yazılabilir':'Writable'}, inplace=True)
 
-while True:
+df['RegisterId'] = df['RegisterId'].str.extract('(\d+)', expand=False)
 
-    clientAzure.on_message_received = message_handler
+for i in df['RegisterValue']:
+    df['RegisterValue'].replace({i:None}, inplace=True)
+
+print(df['RegisterValue'])
+
+df.to_sql('deviceRegisters', conn, if_exists='replace', index = False)
+
 
