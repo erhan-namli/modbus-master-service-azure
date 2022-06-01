@@ -50,23 +50,41 @@ class Worker(QtCore.QThread):
 
     def message_handler(self, message):
 
-        a = str(message)
+        messageComesFromAzure = str(message)
 
-        list = a.split(",")
+        messageComesFromAzure = list(messageComesFromAzure.split(","))
+
+        print(messageComesFromAzure)
 
         newlist = []
 
-        for i in list:
+        if messageComesFromAzure[0] == "b'changeDeviceIp":
 
-            newlist.append(int(re.search(r'\d+', i).group()))
-        
-        print(newlist)
+            print("CHANGE IP")
 
-        client = ModbusClient(host=self.ipAdress, unit_id=self.DeviceID, port = 502)
+            deviceIpAdress = messageComesFromAzure[1][:-1]
 
-        client.open()
+            self.QCombo.setItemText(0, deviceIpAdress)
 
-        client.write_multiple_registers(newlist[0], [newlist[1]])
+            print(type(deviceIpAdress))
+
+            print("Device Ip", deviceIpAdress)
+
+        if messageComesFromAzure[0] == "b'changeRegisterValue":
+
+            print("Change Register Value")
+
+            RegisterId =  int(messageComesFromAzure[1])
+
+            print("Change Register Value 2")
+
+            RegisterChangingValue = messageComesFromAzure[2][:-1]
+
+            client = ModbusClient(host=(self.QCombo.itemText(0)),  port = 502)
+
+            client.open()
+
+            client.write_multiple_registers(int(RegisterId), [int(RegisterChangingValue)])
 
     def run(self):
 
@@ -80,7 +98,7 @@ class Worker(QtCore.QThread):
 
             tempDf = pd.DataFrame()
 
-            client = ModbusClient(host=self.ipAdress, unit_id=self.DeviceID, port = 502)
+            client = ModbusClient(host=(self.QCombo.itemText(0)), unit_id=self.DeviceID, port = 502)
 
             client.open()
 
@@ -103,7 +121,11 @@ class Worker(QtCore.QThread):
 
                 registerFunction = str(self.QTable.item(currentRow, 3).text())
 
-                INDIVIDUAL_REGISTER = {"IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister, "RegisterFunction" : registerFunction}
+                description = str(self.QTable.item(currentRow, 1).text())
+
+                parameterNo = str(self.QTable.item(currentRow, 0).text())
+
+                INDIVIDUAL_REGISTER = {"Description":description, "ParameterNo":parameterNo, "IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister, "RegisterFunction" : registerFunction}
 
                 messageList.append(INDIVIDUAL_REGISTER)
 
@@ -135,7 +157,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def __init__(self, parent=None):
 
-        
         client = ModbusClient(host="192.168.1.200", unit_id=1, port = 502)
         
         client.open()
@@ -210,7 +231,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
         deviceID = int(self.ui.lne_IDNumber.text())
 
-        value = item.text()
+        registerId = item.text()
 
         if self.changedValue == None:
             pass
@@ -220,7 +241,7 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
             client.open()
 
-            client.write_multiple_registers(self.changedValue, [int(value)])
+            client.write_multiple_registers(self.changedValue, [int(registerId)])
 
         self.changedValue  = None
 
@@ -236,7 +257,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
             output.append(row_data)
 
         self.changedValue = int(re.search(r'\d+', output[0][0]).group())
-        print(self.changedValue)
 
     def clearAllRows(self):
 
@@ -529,7 +549,6 @@ class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def registerWriteCode(self):
         
         pass
-
     
     def clearDevices(self):
 
