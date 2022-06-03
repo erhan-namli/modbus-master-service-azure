@@ -7,6 +7,10 @@
  ```bash
  pip install -r requirements.txt
  ```
+ - Lastly use this command to run the application
+  ```bash
+ python main.py
+ ```
 
 
 ![Screenshot](app.PNG)
