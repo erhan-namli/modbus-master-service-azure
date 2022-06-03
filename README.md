@@ -1,5 +1,13 @@
 # Modbus TCP/IP - IoT - GUI
 
+## Installing Dependecies
+
+- Firstly download the program zip file
+- Then after install dependecies using this command in bash
+ ```bash
+ pip install -r requirements.txt
+ ```
+
 ![Screenshot](app.PNG)
 
  ## Libraries
