@@ -1,6 +1,7 @@
 from pyModbusTCP.client import ModbusClient
 
-client = ModbusClient(host="192", port = 502)
+client = ModbusClient(host="192.168.1.201", port = 502)
 
-client.open()
+print(client.open())
+
 

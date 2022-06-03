@@ -84,7 +84,7 @@ class Worker(QtCore.QThread):
 
             client.open()
 
-            client.write_multiple_registers(int(RegisterId), [int(RegisterChangingValue)])
+            client.write_multiple_registers((int(RegisterId)-1), [int(RegisterChangingValue)]) # Register Id = -1 OFFSET 
 
     def run(self):
 
@@ -102,50 +102,50 @@ class Worker(QtCore.QThread):
 
             client.open()
 
-            messageList = []
+            if(client.last_error_txt() == "connect error"):
 
-            currentRow = 0
+                print("CONNECT ERROR")
 
-            azureRegisterValueList = []
+                ERROR_MESSAGE = [{"type":"error", "data":"connect error"}]
 
-            azureRegisterIdList = registersComesFromTable
+                ERROR_MESSAGE = json.dumps(ERROR_MESSAGE)
 
-            for register in registersComesFromTable:
-
-                readedValuefromRegister = client.read_holding_registers(register, 1)
-
-                #azureRegisterValueList.append(readedValuefromRegister)
-
-                if self.QCombo.currentText() == self.ipAdress:
-                    self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
-
-                registerFunction = str(self.QTable.item(currentRow, 3).text())
-
-                description = str(self.QTable.item(currentRow, 1).text())
-
-                parameterNo = str(self.QTable.item(currentRow, 0).text())
-
-                INDIVIDUAL_REGISTER = {"Description":description, "ParameterNo":parameterNo, "IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister, "RegisterFunction" : registerFunction}
-
-                messageList.append(INDIVIDUAL_REGISTER)
-
-                currentRow +=1
-
-            #azureRegisterIdList = ",".join([str(elem) for elem in azureRegisterIdList])
-
-            #AZURE_MESSAGE_PURE = {"IpAdress": self.ipAdress, "RegisterIdList": azureRegisterIdList, "RegisterValueList" : str(azureRegisterValueList)}
-
-            #AZURE_MESSAGE = Message(json.dumps(AZURE_MESSAGE_PURE))
-
-            #print(AZURE_MESSAGE)
-
-            #clientAzure.send_message(str(AZURE_MESSAGE))
-
-            message = Message(json.dumps(messageList))
-
-            clientAzure.send_message(str(message))
+                print(clientAzure.send_message(str(ERROR_MESSAGE)))
             
-            time.sleep(self.clock)
+            else:
+
+                messageList = []
+
+                currentRow = 0
+
+                azureRegisterValueList = []
+
+                azureRegisterIdList = registersComesFromTable
+
+                for register in registersComesFromTable:
+
+                    readedValuefromRegister = client.read_holding_registers(register, 1)
+
+                    if self.QCombo.currentText() == self.ipAdress:
+                        self.QTable.item(currentRow, 2).setText(str(readedValuefromRegister))
+
+                    registerFunction = str(self.QTable.item(currentRow, 3).text())
+
+                    description = str(self.QTable.item(currentRow, 1).text())
+
+                    parameterNo = str(self.QTable.item(currentRow, 0).text())
+
+                    INDIVIDUAL_REGISTER = {"type":"iotdata", "Description":description, "ParameterNo":parameterNo, "IpAdress": self.ipAdress, "RegisterId": register, "RegisterValue": readedValuefromRegister, "RegisterFunction" : registerFunction}
+
+                    messageList.append(INDIVIDUAL_REGISTER)
+
+                    currentRow +=1
+
+                message = Message(json.dumps(messageList))
+
+                clientAzure.send_message(str(message))
+                
+                time.sleep(self.clock)
     
     def stop(self):
 
@@ -156,10 +156,6 @@ class Worker(QtCore.QThread):
 class ModbusMainWindow(QMainWindow, Ui_MainWindow, QWidget):
 
     def __init__(self, parent=None):
-
-        client = ModbusClient(host="192.168.1.200", unit_id=1, port = 502)
-        
-        client.open()
 
         self.changedValue = None
 
