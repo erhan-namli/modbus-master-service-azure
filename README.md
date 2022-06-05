@@ -1,6 +1,20 @@
 # Modbus TCP/IP - IoT - GUI
 
+## Installing Dependecies
+
+- Firstly download the program zip file
+- Then after install dependecies using this command in bash
+ ```bash
+ pip install -r requirements.txt
+ ```
+ - Lastly use this command to run the application
+  ```bash
+ python main.py
+ ```
+
+
 ![Screenshot](app.PNG)
+
 
  ## Libraries
  - GUI library : https://pypi.org/project/PyQt5/
